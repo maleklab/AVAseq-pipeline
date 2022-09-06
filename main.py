@@ -129,9 +129,8 @@ def main(fastaq_files_location):
 	if flag2:
 		print("edgeR statistical analysis ------------------------------------------------------------")
 		subprocess.run(["Rscript", edgeR_script, counts_files_location])  
-		diff_files_location = counts_files_location # diff files are at the same location as .counts, can be changed
 		print("edgeR completed -----------------------------------------------------------------------")
-
+	diff_files_location = counts_files_location  # diff files are at the same location as .counts, can be changed
 
 
 

@@ -429,9 +429,7 @@ def create_protprot_table(input_directory, output_directory, logFC_cutoff, FDR_c
 		print("Filepath: ", filepath)
 
 		condition = os.path.basename(filepath).split(".")[-2][0] # diff names
-
-		libs  = os.path.basename(filepath).split("_")[1][:-7] # project name should not have underscore "_", nor library name
-		# print("Libs: ", libs)
+		libs  = os.path.basename(filepath).split("_")[1].split(".")[0] # project name should not have underscore "_", nor library name
 
 		df_temp = pd.read_csv(filepath, sep = "\t", header = 0)
 		df_temp.columns = 'genes logFC logCPM LR PValue FDR'.split()
