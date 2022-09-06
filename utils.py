@@ -247,26 +247,36 @@ def get_counts_p(file):
 
 ##############################################################################################################
 # Merge all separate replicate files for one library into one table
-def merge_counts(counts_files_location):
+def merge_counts(organization_df, counts_files_location):
 
-	list_of_libraries = []
-	for filepath in glob.iglob(counts_files_location + "*.count"):
-		lib = filepath.split("/")[-1].split("_")[1]
-		if lib not in list_of_libraries:
-			list_of_libraries.append(filepath.split("/")[-1].split("_")[1])
+	list_of_projects = organization_df['Project'].unique()
+	list_of_libraries = organization_df['Library'].unique()
+	list_of_replicates = organization_df['Replicate'].unique()
 
+	nb_replicates = len(list_of_replicates)
+	if nb_replicates!=9:
+		print(f"There is {nb_replicates} instead of expected 9!")
 
-	for lib in list_of_libraries:  # list of libraries
-		for replicate in range(1,10):
-			for filepath in glob.iglob(counts_files_location + f"*_{lib}_{replicate}*.count"):   # must be consistent with name formatting
+	for project in list_of_projects:
+		for library in list_of_libraries:
+			for replicate in range(1, len(list_of_replicates)+1):
+
+				i = organization_df.index[organization_df['Replicate'] == replicate].tolist()
+				if len(i)>1:
+					print("There is error in the organization file, multiple files belond to the same replicate!")
+				else:
+					i = i[0]
+
+				filepath = counts_files_location + str(organization_df.loc[i, "R1"]).replace("R1", "R1R2")[:-9] + "JoinDiff.joinbp.count" # -8 to remove fastq.gz from the name
 				df = pd.read_csv(filepath, sep="\t", names=['FragPair', os.path.basename(filepath)])
 
 				if replicate==1:
 					df_main = df
 				else:
 					df_main = df_main.merge(df, how='outer', on='FragPair').fillna(0)
+		
 		df_main.iloc[:, 1:] = df_main.iloc[:, 1:].astype(int)
-		df_main.to_csv(counts_files_location + "PRS_" + f"{lib}" + ".counts", sep="\t", index=False)
+		df_main.to_csv(counts_files_location + f"{project}" + "_" + f"{library}" + ".counts", sep="\t", index=False)
 
 
 
@@ -401,26 +411,26 @@ def removalFS(diff_files_location, fs_location, logFC_cutoff, FDR_cutoff, output
 		df['frag2'] = broken_df[2] + ':' + broken_df[3]
 		df = df[~(df['frag1'].isin(list_of_problematic_fragments) | df['frag2'].isin(list_of_problematic_fragments))]
 		df.drop(['gene1', 'gene2', 'frag1', 'frag2'], inplace=True, axis=1)
-		df.to_csv(output_directory + os.path.basename(diff_file)[:-4] + "withFSremoval.txt", sep = "\t", index=False)
+		df.to_csv(output_directory + os.path.basename(diff_file)[:-8] + "withFSremovaldiff.txt", sep = "\t", index=False)
 
 
 
 
 ##############################################################################################################
 # Create a table of interactions between proteins
-def create_protprot_table(directory, logFC_cutoff, FDR_cutoff):  # directory is the location of input files, and for the output file
+def create_protprot_table(input_directory, output_directory, logFC_cutoff, FDR_cutoff):  # directory is the location of input files, and for the output file
 
 	# initialize dataframe
 	# Orient1 Orient2 2mM 5mM FCmax FDRmin #Libs uniqFragPairs 
 	df = pd.DataFrame(columns = ['gene1', 'gene2', 'Orient1', 'Orient2', '2mM', '5mM', 'FCmax', 
 		'FDRmin', 'Libs', '#Libs', 'uniqFragPairs', '#uniqFragPairs'])
 
-	for filepath in glob.iglob(output_directory + "*withFSremoval.txt"):  # DIFF AFTER FS REMOVAL
+	for filepath in glob.iglob(input_directory + "*diff.txt"):  # DIFF AFTER FS REMOVAL or without it
 		print("Filepath: ", filepath)
 
-		condition = os.path.basename(filepath).split(".")[-2][0]  
+		condition = os.path.basename(filepath).split(".")[-2][0] # diff names
 
-		libs  = os.path.basename(filepath).split("_")[1]  # DOES THIS ALWAYS HOLD?
+		libs  = os.path.basename(filepath).split("_")[1][:-7] # project name should not have underscore "_", nor library name
 		# print("Libs: ", libs)
 
 		df_temp = pd.read_csv(filepath, sep = "\t", header = 0)
@@ -508,7 +518,7 @@ def create_protprot_table(directory, logFC_cutoff, FDR_cutoff):  # directory is 
 	df.drop(['uniqFragPairs'], inplace=True, axis=1)
 	df.drop(['Libs'], inplace=True, axis=1)
 	df.columns = 'Protein1 Protein2 Orient1 Orient2 2mM 5mM logFCmax FDRmin #Libs #uniqFragPairs'.split()
-	df.to_csv(directory + "protProt_table.txt", index = False, sep = "\t")
+	df.to_csv(output_directory + "protProt_table.txt", index = False, sep = "\t")
 
 
 

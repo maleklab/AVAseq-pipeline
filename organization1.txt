@@ -1,0 +1,15 @@
+R1	R2	Condition	Replicate	Library	Project
+PRS_4_1_S63_R1_001trim.fastq.gz	PRS_4_1_S63_R2_001trim.fastq.gz	0mM	1	3	hpPRS
+PRS_4_2_S64_R1_001trim.fastq.gz	PRS_4_2_S64_R2_001trim.fastq.gz	0mM	2	3	hpPRS
+PRS_4_3_S65_R1_001trim.fastq.gz	PRS_4_3_S65_R2_001trim.fastq.gz	0mM	3	3	hpPRS
+PRS_4_4_S66_R1_001trim.fastq.gz	PRS_4_4_S66_R2_001trim.fastq.gz	2mM	4	3	hpPRS
+PRS_4_5_S67_R1_001trim.fastq.gz	PRS_4_5_S67_R2_001trim.fastq.gz	2mM	5	3	hpPRS
+PRS_4_6_S68_R1_001trim.fastq.gz	PRS_4_6_S68_R2_001trim.fastq.gz	2mM	6	3	hpPRS
+PRS_4_7_S69_R1_001trim.fastq.gz	PRS_4_7_S69_R2_001trim.fastq.gz	5mM	7	3	hpPRS
+PRS_4_8_S70_R1_001trim.fastq.gz	PRS_4_8_S70_R2_001trim.fastq.gz	5mM	8	3	hpPRS
+PRS_4_9_S71_R1_001trim.fastq.gz	PRS_4_9_S71_R2_001trim.fastq.gz	5mM	9	3	hpPRS
+
+
+
+
+
